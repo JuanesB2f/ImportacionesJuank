@@ -28,5 +28,5 @@ export function shopifyAdminProductUrl(productGid: string): string {
 }
 
 export function shopifyAdminProductsUrl(): string {
-  return `https://admin.shopify.com/store/${getShopifyAdminStoreHandle()}`;
+  return `https://admin.shopify.com/store/${getShopifyAdminStoreHandle()}/products`;
 }
