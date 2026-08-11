@@ -1,0 +1,16 @@
+# Linkea la app del Dev Dashboard (mismo Client ID que SHOPIFY_CLIENT_ID en .env.local)
+# https://shopify.dev/docs/apps/tools/cli
+
+name = "ImportacionesJuank"
+client_id = "0a21062f0612af74a522c840efb93d3e"
+application_url = "http://localhost:3000"
+embedded = false
+
+[access_scopes]
+scopes = "write_products,read_products,write_inventory,read_inventory,write_files,read_files,write_publications,read_publications,write_discounts,read_discounts,read_locations"
+
+[auth]
+redirect_urls = [ "http://localhost:3000/api/auth" ]
+
+[webhooks]
+api_version = "2025-10"

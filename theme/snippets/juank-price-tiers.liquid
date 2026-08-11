@@ -1,0 +1,27 @@
+{% comment %}
+  ImportacionesJuank — muestra los 4 precios en la ficha de producto.
+  Pegar en sections/main-product.liquid (o similar), cerca del precio:
+
+  {% render 'juank-price-tiers' %}
+{% endcomment %}
+
+{% assign v = product.selected_or_first_available_variant %}
+{% assign p_emp = v.metafields.importacionesjuank.precio_emprendedor.value %}
+{% assign p_may = v.metafields.importacionesjuank.precio_mayorista.value %}
+{% assign p_dis = v.metafields.importacionesjuank.precio_distribuidor.value %}
+
+<div class="juank-price-tiers" style="margin: 1rem 0; font-size: 0.9rem; line-height: 1.5;">
+  <p style="font-weight: 600; margin-bottom: 0.35rem;">Precios según cantidad</p>
+  <ul style="list-style: none; padding: 0; margin: 0;">
+    <li>Detal (&lt; 6): {{ v.price | money }}</li>
+    {% if p_emp != blank %}
+      <li>Emprendedor (6–11): {{ p_emp | times: 100 | money }}</li>
+    {% endif %}
+    {% if p_may != blank %}
+      <li>Mayorista (12–59): {{ p_may | times: 100 | money }}</li>
+    {% endif %}
+    {% if p_dis != blank %}
+      <li>Distribuidor (60+): {{ p_dis | times: 100 | money }}</li>
+    {% endif %}
+  </ul>
+</div>

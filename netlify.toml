@@ -1,0 +1,22 @@
+# Netlify — Next.js App Router (PIM ImportacionesJuank)
+# https://docs.netlify.com/frameworks/next-js/overview/
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Evita que Netlify intente instalar deps de la extensión Shopify en el root
+  NPM_FLAGS = "--omit=optional"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Sync / subida de imágenes pueden tardar (límite según plan Netlify)
+[functions]
+  node_bundler = "esbuild"
+
+# Ignorar carpetas que no son la app Next (Shopify Function, tema Liquid)
+[build.processing]
+  skip_processing = false
