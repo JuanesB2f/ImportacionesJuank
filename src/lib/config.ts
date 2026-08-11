@@ -1,11 +1,21 @@
-/** Config del PIM — valores de entorno, sin hardcode en UI */
+/** Config del PIM — dominio solo desde env (sin hardcode) */
 
 export function getShopifyStoreDomain(): string {
-  return (
+  const domain = (
     process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN ||
     process.env.SHOPIFY_STORE_DOMAIN ||
-    "je3hk0-dk.myshopify.com"
-  ).replace(/^https?:\/\//, "").replace(/\/$/, "");
+    ""
+  )
+    .replace(/^https?:\/\//, "")
+    .replace(/\/$/, "");
+
+  if (!domain) {
+    throw new Error(
+      "Falta NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN o SHOPIFY_STORE_DOMAIN"
+    );
+  }
+
+  return domain;
 }
 
 export function getShopifyAdminStoreHandle(): string {
@@ -18,5 +28,5 @@ export function shopifyAdminProductUrl(productGid: string): string {
 }
 
 export function shopifyAdminProductsUrl(): string {
-  return `https://admin.shopify.com/store/${getShopifyAdminStoreHandle()}/products`;
+  return `https://admin.shopify.com/store/${getShopifyAdminStoreHandle()}`;
 }

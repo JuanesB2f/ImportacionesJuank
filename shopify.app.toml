@@ -1,8 +1,9 @@
-# Linkea la app del Dev Dashboard (mismo Client ID que SHOPIFY_CLIENT_ID en .env.local)
+# Linkea la app del Dev Dashboard (mismo Client ID que SHOPIFY_CLIENT_ID)
 # https://shopify.dev/docs/apps/tools/cli
+# client_id: pégalo desde .env.local al usar `shopify app deploy --client-id ...`
 
 name = "ImportacionesJuank"
-client_id = "0a21062f0612af74a522c840efb93d3e"
+client_id = "YOUR_SHOPIFY_CLIENT_ID"
 application_url = "http://localhost:3000"
 embedded = false
 

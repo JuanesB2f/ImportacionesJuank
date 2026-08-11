@@ -5,7 +5,10 @@
   publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
+  # Evita falsos positivos del secrets scan en ejemplos / config pública
+  SECRETS_SCAN_OMIT_PATHS = ".env.example,shopify.app.toml"
+  SECRETS_SCAN_OMIT_KEYS = "SUPABASE_STORAGE_BUCKET,NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN,SHOPIFY_CLIENT_ID,SHOPIFY_STORE_DOMAIN"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
