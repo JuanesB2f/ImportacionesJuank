@@ -141,7 +141,6 @@ export function CatalogManager() {
       if (ok) okCount += 1;
     }
     setStatusMsg(`Borradores eliminados: ${okCount} de ${drafts.length}`);
-    // Siempre sincronizar con Shopify (evita fantasmas en la lista)
     await load(q || undefined);
   }
 
@@ -164,26 +163,26 @@ export function CatalogManager() {
 
   if (!mounted) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-16 text-sm text-zinc-500">
+      <div className="mx-auto max-w-6xl px-4 py-16 text-sm text-ios-muted">
         Cargando catálogo…
       </div>
     );
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 py-6 sm:gap-6 sm:py-8 lg:px-6">
+      <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="text-2xl font-semibold tracking-tight text-ios-label sm:text-3xl">
             Catálogo Shopify
           </h1>
-          <p className="mt-1 text-zinc-600">
+          <p className="mt-1 text-sm text-ios-muted sm:text-base">
             Ver, buscar y eliminar productos. Puedes borrar uno, varios o todos
             los borradores.
           </p>
         </div>
         <form
-          className="flex gap-2"
+          className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto"
           onSubmit={(e) => {
             e.preventDefault();
             void load(q);
@@ -193,30 +192,29 @@ export function CatalogManager() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Buscar título o SKU…"
-            className="rounded-lg border border-zinc-300 px-3 py-2 text-sm"
+            className="ios-input sm:min-w-56"
           />
-          <button
-            type="submit"
-            className="rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white"
-          >
-            Buscar
-          </button>
-          <button
-            type="button"
-            onClick={() => void load()}
-            className="rounded-lg border border-zinc-300 px-3 py-2 text-sm"
-          >
-            Recargar
-          </button>
+          <div className="flex gap-2">
+            <button type="submit" className="ios-btn ios-btn-primary flex-1 sm:flex-none">
+              Buscar
+            </button>
+            <button
+              type="button"
+              onClick={() => void load()}
+              className="ios-btn ios-btn-secondary flex-1 sm:flex-none"
+            >
+              Recargar
+            </button>
+          </div>
         </form>
       </header>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <button
           type="button"
           onClick={toggleSelectAll}
           disabled={products.length === 0}
-          className="rounded-lg border border-zinc-300 px-3 py-2 text-sm disabled:opacity-40"
+          className="ios-btn ios-btn-secondary"
         >
           {selected.size === products.length && products.length > 0
             ? "Quitar selección"
@@ -226,7 +224,7 @@ export function CatalogManager() {
           type="button"
           onClick={() => void deleteSelected()}
           disabled={selected.size === 0 || busyIds.size > 0}
-          className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 disabled:opacity-40"
+          className="ios-btn ios-btn-danger"
         >
           Eliminar seleccionados ({selected.size})
         </button>
@@ -236,44 +234,35 @@ export function CatalogManager() {
           disabled={
             !products.some((p) => p.status === "DRAFT") || busyIds.size > 0
           }
-          className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-900 disabled:opacity-40"
+          className="ios-btn ios-btn-secondary border-ios-orange/40 text-ios-orange"
         >
           Eliminar todos los borradores
         </button>
       </div>
 
-      {statusMsg && (
-        <div className="rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-900">
-          {statusMsg}
-        </div>
-      )}
-
-      {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
-        </div>
-      )}
+      {statusMsg && <div className="ios-alert ios-alert-info">{statusMsg}</div>}
+      {error && <div className="ios-alert ios-alert-error">{error}</div>}
 
       {pendingDelete && (
-        <div className="rounded-xl border border-red-300 bg-white p-4 shadow-sm">
-          <p className="text-sm font-medium text-zinc-900">
+        <div className="ios-card p-4 shadow-lg shadow-black/40">
+          <p className="text-sm font-medium text-ios-label">
             ¿Eliminar permanentemente &quot;{pendingDelete.title}&quot;?
           </p>
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-xs text-ios-muted">
             Handle: {pendingDelete.handle} · {pendingDelete.status}
           </p>
-          <div className="mt-3 flex gap-2">
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
             <button
               type="button"
               onClick={() => void confirmPendingDelete()}
-              className="rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white"
+              className="ios-btn ios-btn-danger"
             >
               Sí, eliminar
             </button>
             <button
               type="button"
               onClick={() => setPendingDelete(null)}
-              className="rounded-lg border border-zinc-300 px-3 py-2 text-sm"
+              className="ios-btn ios-btn-secondary"
             >
               Cancelar
             </button>
@@ -282,9 +271,9 @@ export function CatalogManager() {
       )}
 
       {loading ? (
-        <p className="text-sm text-zinc-500">Cargando productos…</p>
+        <p className="text-sm text-ios-muted">Cargando productos…</p>
       ) : products.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-zinc-300 bg-white px-6 py-12 text-center text-sm text-zinc-500">
+        <p className="rounded-ios border border-dashed border-ios-separator bg-ios-elevated px-6 py-12 text-center text-sm text-ios-muted">
           No hay productos (o no coinciden con la búsqueda).
         </p>
       ) : (
@@ -295,91 +284,92 @@ export function CatalogManager() {
             const rowError = rowErrors[p.id];
 
             return (
-              <article
-                key={p.id}
-                className="overflow-hidden rounded-xl border border-zinc-200 bg-white"
-              >
-                <div className="flex flex-wrap items-center gap-3 px-4 py-3">
-                  <input
-                    type="checkbox"
-                    checked={selected.has(p.id)}
-                    onChange={() => toggleSelect(p.id)}
-                    className="h-4 w-4"
-                    aria-label={`Seleccionar ${p.title}`}
-                  />
-                  {p.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={p.imageUrl}
-                      alt=""
-                      className="h-12 w-12 rounded-lg object-cover"
+              <article key={p.id} className="ios-card overflow-hidden">
+                <div className="flex flex-col gap-3 p-3 sm:flex-row sm:flex-wrap sm:items-center sm:px-4 sm:py-3">
+                  <div className="flex min-w-0 flex-1 items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={selected.has(p.id)}
+                      onChange={() => toggleSelect(p.id)}
+                      className="h-4 w-4 shrink-0 accent-ios-blue"
+                      aria-label={`Seleccionar ${p.title}`}
                     />
-                  ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-zinc-100 text-xs text-zinc-400">
-                      N/A
+                    {p.imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={p.imageUrl}
+                        alt=""
+                        className="h-12 w-12 shrink-0 rounded-xl object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-ios-fill text-xs text-ios-faint">
+                        N/A
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <h2 className="truncate font-medium text-ios-label">
+                        {p.title}
+                      </h2>
+                      <p className="text-xs text-ios-muted">
+                        <span className="font-mono">{p.handle}</span>
+                        {" · "}
+                        <span
+                          className={
+                            p.status === "ACTIVE"
+                              ? "text-ios-green"
+                              : "text-ios-orange"
+                          }
+                        >
+                          {p.status}
+                        </span>
+                        {" · "}
+                        Stock: {p.totalInventory ?? 0}
+                        {p.collections.length > 0 &&
+                          ` · ${p.collections.map((c) => c.title).join(", ")}`}
+                      </p>
                     </div>
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <h2 className="truncate font-medium text-zinc-900">
-                      {p.title}
-                    </h2>
-                    <p className="text-xs text-zinc-500">
-                      <span className="font-mono">{p.handle}</span>
-                      {" · "}
-                      <span
-                        className={
-                          p.status === "ACTIVE"
-                            ? "text-teal-700"
-                            : "text-amber-700"
-                        }
-                      >
-                        {p.status}
-                      </span>
-                      {" · "}
-                      Stock total: {p.totalInventory ?? 0}
-                      {p.collections.length > 0 &&
-                        ` · ${p.collections.map((c) => c.title).join(", ")}`}
-                    </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setExpanded(open ? null : p.id)}
-                    className="rounded-lg border border-zinc-300 px-3 py-1.5 text-sm"
-                  >
-                    {open ? "Ocultar" : "Ver variantes"}
-                  </button>
-                  <a
-                    href={shopifyAdminProductUrl(p.id)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="rounded-lg border border-zinc-300 px-3 py-1.5 text-sm"
-                  >
-                    Abrir en Shopify
-                  </a>
-                  <button
-                    type="button"
-                    disabled={deleting}
-                    onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setPendingDelete(p);
-                    }}
-                    className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    {deleting ? "Eliminando…" : "Eliminar"}
-                  </button>
+                  <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => setExpanded(open ? null : p.id)}
+                      className="ios-btn ios-btn-secondary px-2.5! py-1.5! text-xs sm:text-sm"
+                    >
+                      {open ? "Ocultar" : "Variantes"}
+                    </button>
+                    <a
+                      href={shopifyAdminProductUrl(p.id)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="ios-btn ios-btn-secondary px-2.5! py-1.5! text-center text-xs sm:text-sm"
+                    >
+                      Shopify
+                    </a>
+                    <button
+                      type="button"
+                      disabled={deleting}
+                      onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setPendingDelete(p);
+                      }}
+                      className="ios-btn ios-btn-danger px-2.5! py-1.5! text-xs sm:text-sm"
+                    >
+                      {deleting ? "…" : "Eliminar"}
+                    </button>
+                  </div>
                 </div>
 
                 {rowError && (
-                  <div className="border-t border-red-100 bg-red-50 px-4 py-2 text-sm text-red-700">
+                  <div className="border-t border-ios-red/30 bg-ios-red/10 px-4 py-2 text-sm text-ios-red">
                     No se pudo eliminar: {rowError}
                   </div>
                 )}
 
                 {open && (
-                  <div className="border-t border-zinc-100 bg-zinc-50 px-4 py-3">
+                  <div className="overflow-x-auto border-t border-ios-separator/50 bg-ios-secondary/40 px-4 py-3">
                     <table className="min-w-full text-left text-sm">
-                      <thead className="text-xs uppercase text-zinc-500">
+                      <thead className="text-xs uppercase text-ios-muted">
                         <tr>
                           <th className="py-1 pr-3">SKU</th>
                           <th className="py-1 pr-3">Opciones</th>
@@ -389,17 +379,24 @@ export function CatalogManager() {
                       </thead>
                       <tbody>
                         {p.variants.map((v) => (
-                          <tr key={v.id} className="border-t border-zinc-200">
-                            <td className="py-1.5 pr-3 font-mono text-xs">
+                          <tr
+                            key={v.id}
+                            className="border-t border-ios-separator/40"
+                          >
+                            <td className="py-1.5 pr-3 font-mono text-xs text-ios-muted">
                               {v.sku || "—"}
                             </td>
-                            <td className="py-1.5 pr-3">
+                            <td className="py-1.5 pr-3 text-ios-label">
                               {v.selectedOptions
                                 .map((o) => `${o.name}: ${o.value}`)
                                 .join(" / ")}
                             </td>
-                            <td className="py-1.5 pr-3">${v.price}</td>
-                            <td className="py-1.5">{v.inventoryQuantity ?? 0}</td>
+                            <td className="py-1.5 pr-3 tabular-nums">
+                              ${v.price}
+                            </td>
+                            <td className="py-1.5 tabular-nums">
+                              {v.inventoryQuantity ?? 0}
+                            </td>
                           </tr>
                         ))}
                       </tbody>

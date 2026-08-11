@@ -16,30 +16,22 @@ export function FamilyGroupsPanel({
   onClear: () => void;
 }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-4">
+    <div className="ios-card p-4 sm:p-5">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h2 className="text-sm font-semibold text-zinc-900">
+        <div className="min-w-0">
+          <h2 className="text-sm font-semibold text-ios-label">
             Familias (SK, PLZ, CRG…)
           </h2>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-ios-muted">
             Agrupa referencias para trabajarlas juntas. Cada referencia sigue
             siendo un producto.
           </p>
         </div>
         <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={onSelectAll}
-            className="rounded-lg border border-zinc-300 px-2 py-1 text-xs"
-          >
+          <button type="button" onClick={onSelectAll} className="ios-btn ios-btn-secondary px-2.5! py-1! text-xs">
             Todas
           </button>
-          <button
-            type="button"
-            onClick={onClear}
-            className="rounded-lg border border-zinc-300 px-2 py-1 text-xs"
-          >
+          <button type="button" onClick={onClear} className="ios-btn ios-btn-secondary px-2.5! py-1! text-xs">
             Ninguna
           </button>
         </div>
@@ -50,26 +42,26 @@ export function FamilyGroupsPanel({
           return (
             <label
               key={g.prefix}
-              className={`flex cursor-pointer items-start gap-3 rounded-xl border px-3 py-3 ${
+              className={`flex cursor-pointer items-start gap-3 rounded-ios-sm border px-3 py-3 transition ${
                 checked
-                  ? "border-teal-500 bg-teal-50"
-                  : "border-zinc-100 hover:bg-zinc-50"
+                  ? "border-ios-blue bg-ios-blue/15"
+                  : "border-ios-separator/60 bg-ios-secondary/40 hover:bg-ios-fill"
               }`}
             >
               <input
                 type="checkbox"
                 checked={checked}
                 onChange={() => onToggle(g.prefix)}
-                className="mt-1"
+                className="mt-1 accent-ios-blue"
               />
-              <span>
-                <span className="block font-semibold text-zinc-900">
+              <span className="min-w-0">
+                <span className="block font-semibold text-ios-label">
                   {g.prefix}
                 </span>
-                <span className="block text-xs text-zinc-500">
+                <span className="block text-xs text-ios-muted">
                   {g.productCount} productos · {g.variantCount} variantes
                 </span>
-                <span className="mt-1 block font-mono text-[10px] text-zinc-400">
+                <span className="mt-1 block truncate font-mono text-[10px] text-ios-faint">
                   {g.references.slice(0, 6).join(", ")}
                   {g.references.length > 6 ? "…" : ""}
                 </span>

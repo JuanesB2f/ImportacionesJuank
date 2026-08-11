@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
-import { DM_Sans, JetBrains_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Figtree, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const sans = DM_Sans({
+const sans = Figtree({
   variable: "--font-sans",
   subsets: ["latin"],
 });
@@ -15,6 +15,18 @@ const mono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "ImportacionesJuank PIM",
   description: "Centro maestro de catálogo e inventario → Shopify / EMY",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Juank PIM",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -24,7 +36,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className={`${sans.variable} ${mono.variable} h-full`}>
-      <body className="min-h-full font-sans antialiased text-zinc-900">
+      <body className="min-h-dvh font-sans antialiased text-ios-label">
         {children}
       </body>
     </html>

@@ -44,12 +44,12 @@ export function PricingSetup() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-6 sm:gap-6 sm:py-8 lg:px-6">
       <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">
+        <h1 className="text-2xl font-semibold tracking-tight text-ios-label sm:text-3xl">
           Precios por cantidad
         </h1>
-        <p className="text-zinc-600">
+        <p className="text-sm text-ios-muted sm:text-base">
           En el checkout, el cliente paga según cuántas prendas lleva en el
           carrito. El precio Detal es el de la variante; los otros se aplican
           como ajuste automático.
@@ -58,16 +58,13 @@ export function PricingSetup() {
 
       <div className="grid gap-3 sm:grid-cols-2">
         {PRICE_RULES.map((rule) => (
-          <div
-            key={rule.key}
-            className="rounded-2xl border border-zinc-200 bg-white p-4"
-          >
-            <p className="font-semibold text-zinc-900">
+          <div key={rule.key} className="ios-card p-4">
+            <p className="font-semibold text-ios-label">
               {rule.label}{" "}
-              <span className="font-normal text-zinc-500">({rule.range})</span>
+              <span className="font-normal text-ios-muted">({rule.range})</span>
             </p>
-            <p className="mt-1 text-sm text-zinc-600">{rule.description}</p>
-            <p className="mt-2 text-xs text-zinc-400">
+            <p className="mt-1 text-sm text-ios-muted">{rule.description}</p>
+            <p className="mt-2 text-xs text-ios-faint">
               {rule.sendsToShopify
                 ? "Precio de venta en Shopify (variante)"
                 : `Metafield: importacionesjuank.${rule.metafieldKey}`}
@@ -76,43 +73,50 @@ export function PricingSetup() {
         ))}
       </div>
 
-      <ol className="list-decimal space-y-2 rounded-2xl border border-zinc-200 bg-white p-5 pl-9 text-sm text-zinc-700">
+      <ol className="list-decimal space-y-2 rounded-ios border border-ios-separator bg-ios-elevated p-5 pl-9 text-sm text-ios-muted">
         <li>
-          En Dev Dashboard → app → <strong>Scopes</strong>, asegúrate de tener{" "}
-          <code className="rounded bg-zinc-100 px-1">write_discounts</code> y{" "}
-          <code className="rounded bg-zinc-100 px-1">read_discounts</code>.
-          Guarda, publica la versión e <strong>reinstala</strong> la app en la
+          En Dev Dashboard → app → <strong className="text-ios-label">Scopes</strong>, asegúrate de tener{" "}
+          <code className="rounded-md bg-ios-secondary px-1 text-ios-blue">
+            write_discounts
+          </code>{" "}
+          y{" "}
+          <code className="rounded-md bg-ios-secondary px-1 text-ios-blue">
+            read_discounts
+          </code>
+          . Guarda, publica la versión e{" "}
+          <strong className="text-ios-label">reinstala</strong> la app en la
           tienda (sin reinstalar el token no ve los scopes nuevos).
         </li>
         <li>
           La Function ya se despliega con{" "}
-          <code className="rounded bg-zinc-100 px-1">
+          <code className="rounded-md bg-ios-secondary px-1 text-ios-blue">
             npm run shopify:deploy
           </code>{" "}
           (si aún no, ejecútalo una vez).
         </li>
         <li>
-          Aquí: pulsa <strong>Activar descuento en Shopify</strong>.
+          Aquí: pulsa{" "}
+          <strong className="text-ios-label">Activar descuento en Shopify</strong>.
         </li>
         <li>
           Opcional: pega{" "}
-          <code className="rounded bg-zinc-100 px-1">
+          <code className="rounded-md bg-ios-secondary px-1 text-ios-blue">
             theme/snippets/juank-price-tiers.liquid
           </code>{" "}
           en el tema con{" "}
-          <code className="rounded bg-zinc-100 px-1">
+          <code className="rounded-md bg-ios-secondary px-1 text-ios-blue">
             {"{% render 'juank-price-tiers' %}"}
           </code>
           .
         </li>
       </ol>
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <button
           type="button"
           disabled={loading}
           onClick={() => void runSetup(false)}
-          className="rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm font-medium disabled:opacity-40"
+          className="ios-btn ios-btn-secondary"
         >
           Crear metafields
         </button>
@@ -120,16 +124,16 @@ export function PricingSetup() {
           type="button"
           disabled={loading}
           onClick={() => void runSetup(true)}
-          className="rounded-xl bg-teal-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-40"
+          className="ios-btn ios-btn-primary"
         >
           {loading ? "Configurando…" : "Activar descuento en Shopify"}
         </button>
       </div>
 
       {error && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 whitespace-pre-wrap">
+        <div className="ios-alert ios-alert-warning whitespace-pre-wrap">
           {error}
-          <p className="mt-2 text-xs">
+          <p className="mt-2 text-xs opacity-80">
             Si dice que no encuentra la Function, falta el deploy (
             <code>npx shopify app deploy</code>).
           </p>
@@ -137,7 +141,7 @@ export function PricingSetup() {
       )}
 
       {result && (
-        <pre className="overflow-auto rounded-xl border border-teal-200 bg-teal-50 p-4 text-xs text-teal-950">
+        <pre className="ios-alert ios-alert-success overflow-auto whitespace-pre-wrap font-mono text-xs">
           {result}
         </pre>
       )}

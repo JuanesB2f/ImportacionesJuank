@@ -280,12 +280,12 @@ export function ImportConverter() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:gap-8 sm:py-8 lg:px-6">
       <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">
+        <h1 className="text-2xl font-semibold tracking-tight text-ios-label sm:text-3xl">
           Importar inventario
         </h1>
-        <p className="max-w-3xl text-zinc-600">
+        <p className="max-w-3xl text-sm text-ios-muted sm:text-base">
           Sube el Excel: cada referencia (CRG001) es un producto con Color +
           Talla. Elige colección (categoría del menú), precios y foto por color.
         </p>
@@ -300,11 +300,7 @@ export function ImportConverter() {
         onFile={onFileChange}
       />
 
-      {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
-        </div>
-      )}
+      {error && <div className="ios-alert ios-alert-error">{error}</div>}
 
       {data && products.length > 0 && (
         <section className="space-y-6">

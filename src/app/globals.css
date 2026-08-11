@@ -1,18 +1,217 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fafafa;
-  --foreground: #18181b;
+  --ios-bg: #000000;
+  --ios-elevated: #1c1c1e;
+  --ios-secondary: #2c2c2e;
+  --ios-tertiary: #3a3a3c;
+  --ios-fill: rgba(120, 120, 128, 0.28);
+  --ios-separator: rgba(84, 84, 88, 0.65);
+  --ios-label: #f5f5f7;
+  --ios-muted: rgba(235, 235, 245, 0.58);
+  --ios-faint: rgba(235, 235, 245, 0.32);
+  --ios-blue: #0a84ff;
+  --ios-blue-bright: #409cff;
+  --ios-green: #30d158;
+  --ios-orange: #ff9f0a;
+  --ios-red: #ff453a;
+  --ios-yellow: #ffd60a;
+  --ios-radius: 14px;
+  --ios-radius-sm: 10px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --nav-bottom: calc(4.25rem + var(--safe-bottom));
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--ios-bg);
+  --color-foreground: var(--ios-label);
+  --color-ios-bg: var(--ios-bg);
+  --color-ios-elevated: var(--ios-elevated);
+  --color-ios-secondary: var(--ios-secondary);
+  --color-ios-tertiary: var(--ios-tertiary);
+  --color-ios-fill: var(--ios-fill);
+  --color-ios-separator: var(--ios-separator);
+  --color-ios-label: var(--ios-label);
+  --color-ios-muted: var(--ios-muted);
+  --color-ios-faint: var(--ios-faint);
+  --color-ios-blue: var(--ios-blue);
+  --color-ios-blue-bright: var(--ios-blue-bright);
+  --color-ios-green: var(--ios-green);
+  --color-ios-orange: var(--ios-orange);
+  --color-ios-red: var(--ios-red);
+  --color-ios-yellow: var(--ios-yellow);
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, monospace;
+  --radius-ios: var(--ios-radius);
+  --radius-ios-sm: var(--ios-radius-sm);
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--ios-bg);
+  color: var(--ios-label);
+  min-height: 100dvh;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--ios-blue) 40%, transparent);
+  color: white;
+}
+
+/* Controles nativos en dark */
+input,
+textarea,
+select,
+button {
+  font: inherit;
+}
+
+input[type="number"],
+input[type="text"],
+input[type="search"],
+textarea,
+select {
+  color-scheme: dark;
+}
+
+/* Scrollbars discretas tipo iOS */
+@media (pointer: fine) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--ios-tertiary) transparent;
+  }
+}
+
+@keyframes ios-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ios-press {
+  to {
+    transform: scale(0.97);
+  }
+}
+
+.ios-page {
+  animation: ios-fade-up 0.35s ease-out both;
+}
+
+.ios-card {
+  border-radius: var(--ios-radius);
+  background: var(--ios-elevated);
+  border: 1px solid var(--ios-separator);
+}
+
+.ios-input {
+  width: 100%;
+  border-radius: var(--ios-radius-sm);
+  border: 1px solid var(--ios-separator);
+  background: var(--ios-secondary);
+  color: var(--ios-label);
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ios-input:focus {
+  border-color: var(--ios-blue);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ios-blue) 28%, transparent);
+}
+
+.ios-input::placeholder {
+  color: var(--ios-faint);
+}
+
+.ios-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  border-radius: var(--ios-radius-sm);
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 560;
+  transition: background 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
+}
+
+.ios-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.ios-btn:disabled {
+  opacity: 0.4;
+}
+
+.ios-btn-primary {
+  background: var(--ios-blue);
+  color: white;
+}
+
+.ios-btn-primary:hover:not(:disabled) {
+  background: var(--ios-blue-bright);
+}
+
+.ios-btn-secondary {
+  background: var(--ios-secondary);
+  color: var(--ios-label);
+  border: 1px solid var(--ios-separator);
+}
+
+.ios-btn-secondary:hover:not(:disabled) {
+  background: var(--ios-tertiary);
+}
+
+.ios-btn-danger {
+  background: color-mix(in srgb, var(--ios-red) 18%, transparent);
+  color: var(--ios-red);
+  border: 1px solid color-mix(in srgb, var(--ios-red) 35%, transparent);
+}
+
+.ios-btn-danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ios-red) 28%, transparent);
+}
+
+.ios-alert {
+  border-radius: var(--ios-radius);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+}
+
+.ios-alert-error {
+  background: color-mix(in srgb, var(--ios-red) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ios-red) 35%, transparent);
+  color: #ff8a80;
+}
+
+.ios-alert-success {
+  background: color-mix(in srgb, var(--ios-green) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ios-green) 35%, transparent);
+  color: #7dff9a;
+}
+
+.ios-alert-warning {
+  background: color-mix(in srgb, var(--ios-orange) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ios-orange) 35%, transparent);
+  color: #ffcc80;
+}
+
+.ios-alert-info {
+  background: color-mix(in srgb, var(--ios-blue) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ios-blue) 35%, transparent);
+  color: #9ec9ff;
 }

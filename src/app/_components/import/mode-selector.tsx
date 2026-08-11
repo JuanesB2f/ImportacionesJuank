@@ -37,14 +37,14 @@ export function ImportModeSelector({
             key={mode.id}
             type="button"
             onClick={() => onChange(mode.id)}
-            className={`rounded-2xl border p-4 text-left transition ${
+            className={`rounded-ios border p-4 text-left transition active:scale-[0.98] ${
               active
-                ? "border-teal-600 bg-teal-50 ring-2 ring-teal-600/20"
-                : "border-zinc-200 bg-white hover:border-zinc-300"
+                ? "border-ios-blue bg-ios-blue/15 ring-2 ring-ios-blue/25"
+                : "border-ios-separator bg-ios-elevated hover:border-ios-tertiary"
             }`}
           >
-            <p className="font-semibold text-zinc-900">{mode.title}</p>
-            <p className="mt-1 text-sm text-zinc-600">{mode.description}</p>
+            <p className="font-semibold text-ios-label">{mode.title}</p>
+            <p className="mt-1 text-sm text-ios-muted">{mode.description}</p>
           </button>
         );
       })}

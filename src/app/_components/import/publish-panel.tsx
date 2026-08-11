@@ -31,9 +31,9 @@ export function PublishPanel({
 }) {
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+      <div className="ios-alert ios-alert-warning">
         <p className="font-semibold">Inicio de Shopify (Colección destacada)</p>
-        <p className="mt-1 text-xs leading-relaxed">
+        <p className="mt-1 text-xs leading-relaxed opacity-90">
           Los productos <strong>no van al inicio</strong> solos. Solo aparecen
           ahí si marcas “Página de inicio” / Destacados, o si el tema apunta la
           sección a “Todos los productos”. Usa colecciones como Jeans o Corsets
@@ -42,16 +42,16 @@ export function PublishPanel({
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-xl border border-zinc-200 bg-white p-4">
-          <h2 className="mb-2 text-sm font-semibold text-zinc-900">
+        <div className="ios-card p-4">
+          <h2 className="mb-2 text-sm font-semibold text-ios-label">
             Destino en Shopify (colección / categoría)
           </h2>
-          <p className="mb-3 text-xs text-zinc-500">
+          <p className="mb-3 text-xs text-ios-muted">
             Ej. Jeans, Corsets… — menú DAMAS. No marques “Página de inicio” salvo
             que quieras ese producto en el home.
           </p>
           {collections.length === 0 ? (
-            <p className="text-sm text-amber-700">
+            <p className="text-sm text-ios-orange">
               Crea colecciones en Shopify (ej. Jeans) para asignar destino.
             </p>
           ) : (
@@ -61,24 +61,24 @@ export function PublishPanel({
                 return (
                   <label
                     key={c.id}
-                    className={`flex cursor-pointer items-start gap-2 rounded-lg border px-3 py-2 text-sm hover:bg-zinc-50 ${
+                    className={`flex cursor-pointer items-start gap-2 rounded-ios-sm border px-3 py-2 text-sm transition hover:bg-ios-fill ${
                       homeRisk
-                        ? "border-amber-200 bg-amber-50/60"
-                        : "border-zinc-100"
+                        ? "border-ios-orange/40 bg-ios-orange/10"
+                        : "border-ios-separator/50 bg-ios-secondary/30"
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={selectedCollections.includes(c.id)}
                       onChange={() => onToggleCollection(c.id)}
-                      className="mt-0.5"
+                      className="mt-0.5 accent-ios-blue"
                     />
                     <span>
-                      <span className="font-medium text-zinc-800">
+                      <span className="font-medium text-ios-label">
                         {c.title}
                       </span>
                       {homeRisk ? (
-                        <span className="mt-0.5 block text-[11px] text-amber-800">
+                        <span className="mt-0.5 block text-[11px] text-ios-orange">
                           Alimenta el inicio — solo si quieres destacarlo
                         </span>
                       ) : null}
@@ -90,8 +90,8 @@ export function PublishPanel({
           )}
         </div>
 
-        <div className="rounded-xl border border-zinc-200 bg-white p-4">
-          <h2 className="mb-2 text-sm font-semibold text-zinc-900">
+        <div className="ios-card p-4">
+          <h2 className="mb-2 text-sm font-semibold text-ios-label">
             Estado al publicar
           </h2>
           <div className="flex flex-col gap-2">
@@ -111,29 +111,29 @@ export function PublishPanel({
             ).map((opt) => (
               <label
                 key={opt.id}
-                className="flex cursor-pointer items-start gap-2 rounded-lg border border-zinc-100 px-3 py-3 text-sm"
+                className="flex cursor-pointer items-start gap-2 rounded-ios-sm border border-ios-separator/50 bg-ios-secondary/30 px-3 py-3 text-sm"
               >
                 <input
                   type="radio"
                   name="status"
                   checked={publishStatus === opt.id}
                   onChange={() => onStatusChange(opt.id)}
-                  className="mt-1"
+                  className="mt-1 accent-ios-blue"
                 />
                 <span>
-                  <span className="font-medium">{opt.label}</span>
-                  <span className="block text-xs text-zinc-500">{opt.hint}</span>
+                  <span className="font-medium text-ios-label">{opt.label}</span>
+                  <span className="block text-xs text-ios-muted">{opt.hint}</span>
                 </span>
               </label>
             ))}
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-3">
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             <button
               type="button"
               onClick={onDownloadCsv}
               disabled={!hasCsv || syncing}
-              className="rounded-lg border border-zinc-300 px-4 py-2.5 text-sm font-medium disabled:opacity-40"
+              className="ios-btn ios-btn-secondary w-full sm:w-auto"
             >
               Descargar CSV
             </button>
@@ -141,7 +141,7 @@ export function PublishPanel({
               type="button"
               onClick={onSync}
               disabled={!canSync || syncing}
-              className="rounded-lg bg-teal-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-40"
+              className="ios-btn ios-btn-primary w-full sm:w-auto"
             >
               {syncing
                 ? "Subiendo…"
