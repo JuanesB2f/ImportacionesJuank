@@ -1,9 +1,8 @@
-{% comment %}
-  ImportacionesJuank — muestra los 4 precios en la ficha de producto.
-  Pegar en sections/main-product.liquid (o similar), cerca del precio:
-
-  {% render 'juank-price-tiers' %}
-{% endcomment %}
+{% doc %}
+Shows quantity price tiers and limits the product quantity selector to stock.
+@example
+{% render 'juank-price-tiers' %}
+{% enddoc %}
 
 {% assign v = product.selected_or_first_available_variant %}
 {% assign p_emp = v.metafields.importacionesjuank.precio_emprendedor.value %}
@@ -25,3 +24,5 @@
     {% endif %}
   </ul>
 </div>
+
+{% render 'juank-qty-limit' %}

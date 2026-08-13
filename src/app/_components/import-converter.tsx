@@ -18,10 +18,11 @@ import {
 } from "./import/feedback";
 import { ImportModeSelector } from "./import/mode-selector";
 import { PublishPanel } from "./import/publish-panel";
-import { ReferencePricingPanel } from "./import/reference-pricing";
+import { ReferencePricingPanel, type PricingMode } from "./import/reference-pricing";
 import {
   applyPricesToProducts,
   emptyBulkPrices,
+  PRICE_FIELDS,
   type BulkPrices,
   type CollectionOption,
   type ImportApiResponse,
@@ -45,7 +46,10 @@ export function ImportConverter() {
   );
   const [bulkPrices, setBulkPrices] = useState<BulkPrices>(emptyBulkPrices);
   const [refQuery, setRefQuery] = useState("");
+  const [pricingMode, setPricingMode] = useState<PricingMode>("single");
+  const [activeReference, setActiveReference] = useState<string | null>(null);
   const [selectedRefs, setSelectedRefs] = useState<string[]>([]);
+  const [savedFlash, setSavedFlash] = useState<string | null>(null);
   const [uploadingKey, setUploadingKey] = useState<string | null>(null);
 
   const hasBlockingErrors =
@@ -68,7 +72,12 @@ export function ImportConverter() {
     });
   }, [selectedProducts, refQuery]);
 
-  const pricedTargets = useMemo(() => {
+  const activeProduct = useMemo(() => {
+    if (!activeReference) return null;
+    return selectedProducts.find((p) => p.reference === activeReference) ?? null;
+  }, [selectedProducts, activeReference]);
+
+  const bulkProducts = useMemo(() => {
     if (selectedRefs.length === 0) return [];
     const set = new Set(selectedRefs);
     return selectedProducts.filter((p) => set.has(p.reference));
@@ -120,7 +129,11 @@ export function ImportConverter() {
       setSelectedPrefixes(
         groupProductsByPrefix(json.preview.products).map((g) => g.prefix)
       );
-      setSelectedRefs(json.preview.products.map((p) => p.reference));
+      setActiveReference(null);
+      setSelectedRefs([]);
+      setPricingMode("single");
+      setBulkPrices(emptyBulkPrices());
+      setSavedFlash(null);
       setRefQuery("");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error desconocido");
@@ -151,29 +164,113 @@ export function ImportConverter() {
     );
   }
 
-  function applyPricesToSelectedReferences() {
-    if (selectedRefs.length === 0) {
-      setError("Selecciona al menos una referencia para poner precios");
+  function pricesFromProduct(p: CatalogProduct): BulkPrices {
+    const v = p.variants[0];
+    if (!v) return emptyBulkPrices();
+    return {
+      priceRetail: v.priceRetail > 0 ? String(v.priceRetail) : "",
+      priceEntrepreneur:
+        v.priceEntrepreneur > 0 ? String(v.priceEntrepreneur) : "",
+      priceWholesale: v.priceWholesale > 0 ? String(v.priceWholesale) : "",
+      priceDistributor:
+        v.priceDistributor > 0 ? String(v.priceDistributor) : "",
+    };
+  }
+
+  function selectReference(reference: string) {
+    const product = selectedProducts.find((p) => p.reference === reference);
+    setActiveReference(reference);
+    setBulkPrices(product ? pricesFromProduct(product) : emptyBulkPrices());
+    setSavedFlash(null);
+    setError(null);
+  }
+
+  function savePricesForActive(advance: boolean) {
+    if (!activeReference) {
+      setError("Selecciona una referencia para guardar precios");
       return;
     }
+
+    const filled = PRICE_FIELDS.filter(
+      ({ field }) => bulkPrices[field].trim() !== ""
+    );
+    if (filled.length === 0) {
+      setError("Ingresa al menos un precio (puedes dejar los demás vacíos)");
+      return;
+    }
+
+    setProducts((prev) =>
+      applyPricesToProducts(prev, [activeReference], bulkPrices)
+    );
+    setSavedFlash(
+      `Guardado ${activeReference} (${filled.length} precio${filled.length === 1 ? "" : "s"})`
+    );
+    setError(null);
+
+    if (!advance) return;
+
+    const list = filteredReferences;
+    const idx = list.findIndex((p) => p.reference === activeReference);
+    const next = idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null;
+    if (next) {
+      selectReference(next.reference);
+    }
+  }
+
+  function applyBulkPrices() {
+    if (selectedRefs.length === 0) {
+      setError("Selecciona al menos una referencia para el precio masivo");
+      return;
+    }
+    const filled = PRICE_FIELDS.filter(
+      ({ field }) => bulkPrices[field].trim() !== ""
+    );
+    if (filled.length === 0) {
+      setError("Ingresa al menos un precio (puedes dejar los demás vacíos)");
+      return;
+    }
+
     setProducts((prev) =>
       applyPricesToProducts(prev, selectedRefs, bulkPrices)
+    );
+    setSavedFlash(
+      `Aplicado a ${selectedRefs.length} referencia${selectedRefs.length === 1 ? "" : "s"} (${filled.length} precio${filled.length === 1 ? "" : "s"})`
     );
     setError(null);
   }
 
+  function changePricingMode(mode: PricingMode) {
+    setPricingMode(mode);
+    setSavedFlash(null);
+    setError(null);
+    if (mode === "bulk") {
+      setBulkPrices(emptyBulkPrices());
+    } else if (activeReference) {
+      const product = selectedProducts.find(
+        (p) => p.reference === activeReference
+      );
+      setBulkPrices(product ? pricesFromProduct(product) : emptyBulkPrices());
+    }
+  }
+
   async function uploadColorImage(
-    reference: string,
+    references: string | string[],
     color: string,
     file: File
   ) {
-    const key = `${reference}||${color}`;
+    const refs = Array.isArray(references) ? references : [references];
+    if (refs.length === 0) return;
+
+    const key =
+      refs.length === 1
+        ? `${refs[0]}||${color}`
+        : `bulk||${color}||${refs.length}`;
     setUploadingKey(key);
     setError(null);
     try {
       const form = new FormData();
       form.append("file", file);
-      form.append("reference", `${reference}-${color}`);
+      form.append("reference", `${refs[0]}-${color}`);
       const res = await fetch("/api/shopify/upload-image", {
         method: "POST",
         body: form,
@@ -186,9 +283,10 @@ export function ImportConverter() {
       if (!res.ok || !json.url) {
         throw new Error(json.error ?? "No se pudo subir la imagen");
       }
+      const refSet = new Set(refs);
       setProducts((prev) =>
         prev.map((p) =>
-          p.reference === reference
+          refSet.has(p.reference)
             ? upsertColorImage(p, {
                 color,
                 url: json.url!,
@@ -196,6 +294,11 @@ export function ImportConverter() {
               })
             : p
         )
+      );
+      setSavedFlash(
+        refs.length === 1
+          ? `Foto ${color} en ${refs[0]}`
+          : `Foto ${color} en ${refs.length} referencias`
       );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error al subir imagen");
@@ -328,29 +431,37 @@ export function ImportConverter() {
           />
 
           <ReferencePricingPanel
+            mode={pricingMode}
             filteredReferences={filteredReferences}
+            activeReference={activeReference}
+            activeProduct={activeProduct}
             selectedRefs={selectedRefs}
-            pricedTargets={pricedTargets}
             bulkPrices={bulkPrices}
             refQuery={refQuery}
             uploadingKey={uploadingKey}
+            savedFlash={savedFlash}
+            onModeChange={changePricingMode}
             onRefQueryChange={setRefQuery}
-            onToggleRef={(reference) =>
+            onSelectReference={selectReference}
+            onToggleBulkRef={(reference) =>
               setSelectedRefs((prev) =>
                 prev.includes(reference)
                   ? prev.filter((r) => r !== reference)
                   : [...prev, reference]
               )
             }
-            onSelectVisible={() =>
+            onSelectAllVisible={() =>
               setSelectedRefs(filteredReferences.map((p) => p.reference))
             }
-            onClearSelection={() => setSelectedRefs([])}
+            onClearBulkSelection={() => setSelectedRefs([])}
             onBulkPriceChange={(field, value) =>
               setBulkPrices((b) => ({ ...b, [field]: value }))
             }
-            onApplyPrices={applyPricesToSelectedReferences}
+            onSavePrices={() => savePricesForActive(false)}
+            onSaveAndNext={() => savePricesForActive(true)}
+            onApplyBulkPrices={applyBulkPrices}
             onUploadColorImage={uploadColorImage}
+            bulkProducts={bulkProducts}
           />
 
           <PublishPanel

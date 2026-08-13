@@ -1,0 +1,202 @@
+{% doc %}
+Limits the product quantity selector to available stock. If a variant has 1 unit, the selector stays locked at 1.
+@example
+{% render 'juank-qty-limit' %}
+{% enddoc %}
+
+{% if product %}
+  <script type="application/json" data-juank-stock>
+    {
+      {%- for variant in product.variants -%}
+        "{{ variant.id }}": {
+          "qty": {{ variant.inventory_quantity | default: 0 }},
+          "tracked": {% if variant.inventory_management %}true{% else %}false{% endif %},
+          "deny": {% if variant.inventory_policy == 'deny' %}true{% else %}false{% endif %}
+        }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    }
+  </script>
+  <p class="juank-qty-hint" data-juank-qty-hint hidden></p>
+{% endif %}
+
+{% stylesheet %}
+  .juank-qty-hint {
+    margin: 0.35rem 0 0;
+    font-size: 0.8rem;
+    color: rgba(0, 0, 0, 0.62);
+  }
+
+  .juank-qty-locked {
+    opacity: 0.72;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (() => {
+    const stockNode = document.querySelector("[data-juank-stock]");
+    if (!stockNode) return;
+
+    let stock = {};
+    try {
+      stock = JSON.parse(stockNode.textContent || "{}");
+    } catch {
+      return;
+    }
+
+    const hint = document.querySelector("[data-juank-qty-hint]");
+
+    const qtySelector = [
+      'form[action*="/cart/add"] input[name="quantity"]',
+      'form[action*="/cart/add"] input[name="quantity[]"]',
+      "quantity-input input",
+      "quantity-selector input",
+      ".quantity input",
+      ".quantity-selector input",
+    ].join(",");
+
+    const plusSelector = [
+      'button[name="plus"]',
+      'button[name="increment"]',
+      'button[name="Increase"]',
+      'button[property="plus"]',
+      "[data-quantity-increment]",
+      ".quantity__button--plus",
+    ].join(",");
+
+    const minusSelector = [
+      'button[name="minus"]',
+      'button[name="decrement"]',
+      'button[name="Decrease"]',
+      'button[property="minus"]',
+      "[data-quantity-decrement]",
+      ".quantity__button--minus",
+    ].join(",");
+
+    function currentVariantId() {
+      const input = document.querySelector(
+        'form[action*="/cart/add"] [name="id"]'
+      );
+      return input ? String(input.value) : Object.keys(stock)[0];
+    }
+
+    function maxFor(variantId) {
+      const row = stock[variantId];
+      if (!row || !row.tracked || !row.deny) return null;
+      return Math.max(0, Number(row.qty) || 0);
+    }
+
+    function closestQtyRoot(input) {
+      return (
+        input.closest(
+          "quantity-input, quantity-selector, .quantity, .quantity-selector, .product-form__input"
+        ) || input.parentElement
+      );
+    }
+
+    function apply() {
+      const variantId = currentVariantId();
+      const max = maxFor(variantId);
+      const inputs = document.querySelectorAll(qtySelector);
+
+      inputs.forEach((input) => {
+        if (!(input instanceof HTMLInputElement)) return;
+        const root = closestQtyRoot(input);
+        const plus = root?.querySelector(plusSelector);
+        const minus = root?.querySelector(minusSelector);
+
+        if (max == null || max < 1) {
+          input.removeAttribute("max");
+          input.readOnly = false;
+          plus?.removeAttribute("disabled");
+          minus?.removeAttribute("disabled");
+          root?.classList.remove("juank-qty-locked");
+          return;
+        }
+
+        input.min = "1";
+        input.max = String(max);
+        const value = Math.min(Math.max(Number(input.value) || 1, 1), max);
+        input.value = String(value);
+
+        const atMax = value >= max;
+        const atMin = value <= 1;
+        if (plus instanceof HTMLButtonElement) plus.disabled = atMax;
+        if (minus instanceof HTMLButtonElement) minus.disabled = atMin;
+
+        const locked = max <= 1;
+        input.readOnly = locked;
+        root?.classList.toggle("juank-qty-locked", locked);
+      });
+
+      if (hint instanceof HTMLElement) {
+        if (max != null && max <= 1) {
+          hint.hidden = false;
+          hint.textContent = "Solo 1 disponible — la cantidad está bloqueada.";
+        } else if (max != null) {
+          hint.hidden = false;
+          hint.textContent = `Máximo ${max} según el stock de esta talla/color.`;
+        } else {
+          hint.hidden = true;
+          hint.textContent = "";
+        }
+      }
+    }
+
+    document.addEventListener(
+      "click",
+      (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        const plus = target.closest(plusSelector);
+        if (!plus) return;
+        const root = closestQtyRoot(plus);
+        const input = root?.querySelector("input");
+        if (!(input instanceof HTMLInputElement)) return;
+        const max = Number(input.max);
+        if (!max) return;
+        if ((Number(input.value) || 1) >= max) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      },
+      true
+    );
+
+    document.addEventListener("change", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (
+        target.matches('[name="id"]') ||
+        target.matches('[name="quantity"]') ||
+        target.closest("variant-selects, variant-radios, .product-form")
+      ) {
+        apply();
+      }
+    });
+
+    document.addEventListener("input", (event) => {
+      const target = event.target;
+      if (target instanceof HTMLInputElement && target.matches('[name="quantity"]')) {
+        apply();
+      }
+    });
+
+    ["variant:change", "product:variant-change"].forEach((name) => {
+      document.addEventListener(name, apply);
+    });
+
+    const idInput = document.querySelector(
+      'form[action*="/cart/add"] [name="id"]'
+    );
+    if (idInput) {
+      new MutationObserver(apply).observe(idInput, {
+        attributes: true,
+        attributeFilter: ["value"],
+      });
+    }
+
+    apply();
+    document.addEventListener("DOMContentLoaded", apply);
+    document.addEventListener("shopify:section:load", apply);
+  })();
+{% endjavascript %}

@@ -99,15 +99,20 @@ export function PricingSetup() {
           <strong className="text-ios-label">Activar descuento en Shopify</strong>.
         </li>
         <li>
-          Opcional: pega{" "}
+          En el tema, sube{" "}
           <code className="rounded-md bg-ios-secondary px-1 text-ios-blue">
             theme/snippets/juank-price-tiers.liquid
           </code>{" "}
-          en el tema con{" "}
+          y{" "}
+          <code className="rounded-md bg-ios-secondary px-1 text-ios-blue">
+            theme/snippets/juank-qty-limit.liquid
+          </code>
+          . En la ficha de producto (o un bloque Liquid personalizado) pon{" "}
           <code className="rounded-md bg-ios-secondary px-1 text-ios-blue">
             {"{% render 'juank-price-tiers' %}"}
           </code>
-          .
+          . Así el selector de cantidad se bloquea según el stock (si hay 1,
+          queda en 1).
         </li>
       </ol>
 
